@@ -37,6 +37,16 @@
       max-width: 200px;
       margin-bottom: 20px;
     }
+
+    .edit-buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .edit-buttons button {
+      margin-left: 5px;
+    }
   </style>
 </head>
 <body>
@@ -49,9 +59,10 @@
         <th>Scam Number</th>
         <th>Status</th>
         <th>Date</th>
+        <th>Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="scamTableBody">
       <!-- Add rows dynamically using JavaScript -->
     </tbody>
   </table>
@@ -73,19 +84,56 @@
   </form>
 
   <script>
+    // Function to create edit buttons for each row
+    function createEditButtons(row) {
+      var editButtons = document.createElement("div");
+      editButtons.classList.add("edit-buttons");
+
+      var editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", function() {
+        editRow(row);
+      });
+      editButtons.appendChild(editButton);
+
+      var deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", function() {
+        deleteRow(row);
+      });
+      editButtons.appendChild(deleteButton);
+
+      return editButtons;
+    }
+
+    // Function to edit a row's values
+    function editRow(row) {
+      var cells = row.cells;
+
+      var scamType = prompt("Enter the new scam type:", cells[0].textContent);
+      var scamNumber = prompt("Enter the new scam number:", cells[1].textContent);
+      var scamStatus = prompt("Enter the new status (active/not active):", cells[2].textContent);
+
+      cells[0].textContent = scamType;
+      cells[1].textContent = scamNumber;
+      cells[2].textContent = scamStatus;
+    }
+
+    // Function to delete a row
+    function deleteRow(row) {
+      row.remove();
+    }
+
     document.getElementById("addScamForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      // Get the input values
       var scamType = document.getElementById("scamType").value;
       var scamNumber = document.getElementById("scamNumber").value;
       var scamStatus = document.getElementById("scamStatus").value;
       var date = new Date();
 
-      // Create a new table row
       var newRow = document.createElement("tr");
 
-      // Create table cells for the data
       var typeCell = document.createElement("td");
       typeCell.textContent = scamType;
 
@@ -98,16 +146,17 @@
       var dateCell = document.createElement("td");
       dateCell.textContent = date.toLocaleDateString();
 
-      // Append the cells to the row
+      var actionsCell = document.createElement("td");
+      actionsCell.appendChild(createEditButtons(newRow));
+
       newRow.appendChild(typeCell);
       newRow.appendChild(numberCell);
       newRow.appendChild(statusCell);
       newRow.appendChild(dateCell);
+      newRow.appendChild(actionsCell);
 
-      // Append the row to the table body
-      document.querySelector("tbody").appendChild(newRow);
+      document.getElementById("scamTableBody").appendChild(newRow);
 
-      // Reset the form fields
       document.getElementById("scamType").value = "";
       document.getElementById("scamNumber").value = "";
       document.getElementById("scamStatus").value = "active";
